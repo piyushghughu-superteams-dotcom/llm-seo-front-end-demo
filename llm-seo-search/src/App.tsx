@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   Bot, 
@@ -154,28 +154,35 @@ const Sidebar = ({
     <div className="flex-1 overflow-y-auto">
       <nav className="p-4 space-y-1">
         <div className="px-3 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Workspace</div>
-        <button 
+        <button
           onClick={() => setView('runs')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${currentView === 'runs' ? 'bg-white border border-neutral-200 text-black shadow-sm' : 'text-neutral-600 hover:bg-neutral-100'}`}
         >
           <Play size={18} />
           <span className="text-sm font-medium">Active Runs</span>
         </button>
-        <button 
+        <button
           onClick={() => setView('keywords')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${currentView === 'keywords' ? 'bg-white border border-neutral-200 text-black shadow-sm' : 'text-neutral-600 hover:bg-neutral-100'}`}
         >
           <LayoutDashboard size={18} />
           <span className="text-sm font-medium">Keywords & Groups</span>
         </button>
-        <button 
+        <button
+          onClick={() => setView('schedules')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${currentView === 'schedules' ? 'bg-white border border-neutral-200 text-black shadow-sm' : 'text-neutral-600 hover:bg-neutral-100'}`}
+        >
+          <Clock size={18} />
+          <span className="text-sm font-medium">Scheduled Runs</span>
+        </button>
+        <button
           onClick={() => setView('reports')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${currentView === 'reports' ? 'bg-white border border-neutral-200 text-black shadow-sm' : 'text-neutral-600 hover:bg-neutral-100'}`}
         >
           <FileText size={18} />
           <span className="text-sm font-medium">Reports</span>
         </button>
-        <button 
+        <button
           onClick={() => setView('settings')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${currentView === 'settings' ? 'bg-white border border-neutral-200 text-black shadow-sm' : 'text-neutral-600 hover:bg-neutral-100'}`}
         >
@@ -1019,13 +1026,14 @@ export default function App() {
   const [results, setResults] = useState<RunResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   // Initialize with some mock history for the graph/table to show
   React.useEffect(() => {
     // Generate some mock history for today
     const mockHistory: RunResult[] = [];
     const today = new Date().toISOString();
-    
+
     // Only generate for first 3 keywords to simulate partial run
     keywords.slice(0, 3).forEach(k => {
       llms.filter(l => l.enabled).forEach(l => {
@@ -1046,6 +1054,94 @@ export default function App() {
     });
     setResults(mockHistory);
   }, []); // Run once on mount
+
+  // Calculate next run time for a schedule
+  const calculateNextRun = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const now = new Date();
+    const nextRun = new Date();
+    nextRun.setHours(hours, minutes, 0, 0);
+
+    // If the time has already passed today, set it for tomorrow
+    if (nextRun <= now) {
+      nextRun.setDate(nextRun.getDate() + 1);
+    }
+
+    return nextRun.toISOString();
+  };
+
+  // Add a new schedule
+  const addSchedule = (scheduleData: Omit<Schedule, 'id' | 'nextRun'>) => {
+    const newSchedule: Schedule = {
+      ...scheduleData,
+      id: Date.now().toString(),
+      nextRun: calculateNextRun(scheduleData.time)
+    };
+    setSchedules([...schedules, newSchedule]);
+  };
+
+  // Update a schedule
+  const updateSchedule = (id: string, updates: Partial<Schedule>) => {
+    setSchedules(schedules.map(schedule =>
+      schedule.id === id
+        ? { ...schedule, ...updates }
+        : schedule
+    ));
+  };
+
+  // Delete a schedule
+  const deleteSchedule = (id: string) => {
+    setSchedules(schedules.filter(schedule => schedule.id !== id));
+  };
+
+  // Toggle schedule enabled/disabled
+  const toggleSchedule = (id: string) => {
+    setSchedules(schedules.map(schedule =>
+      schedule.id === id
+        ? { ...schedule, enabled: !schedule.enabled, nextRun: calculateNextRun(schedule.time) }
+        : schedule
+    ));
+  };
+
+  // Function to run a scheduled audit
+  const runScheduledAudit = (schedule: Schedule) => {
+    if (!schedule.enabled) return;
+
+    console.log(`Running scheduled audit: ${schedule.name}`);
+    startRun(schedule.groupId);
+
+    // Update the last run time
+    updateSchedule(schedule.id, {
+      lastRun: new Date().toISOString(),
+      nextRun: calculateNextRun(schedule.time)
+    });
+  };
+
+  // Timer logic for scheduled runs
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+      schedules.forEach(schedule => {
+        if (schedule.enabled && schedule.time === currentTimeStr) {
+          // Check if it's the same minute as the next scheduled run
+          const nextRunTime = new Date(schedule.nextRun);
+          if (
+            now.getDate() === nextRunTime.getDate() &&
+            now.getMonth() === nextRunTime.getMonth() &&
+            now.getFullYear() === nextRunTime.getFullYear() &&
+            now.getHours() === nextRunTime.getHours() &&
+            now.getMinutes() === nextRunTime.getMinutes()
+          ) {
+            runScheduledAudit(schedule);
+          }
+        }
+      });
+    }, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, [schedules]);
 
   // Actions
   const addKeyword = (text: string, groupId: string) => {
@@ -1189,6 +1285,16 @@ export default function App() {
           )}
           {currentView === 'reports' && (
             <ReportsView />
+          )}
+          {currentView === 'schedules' && (
+            <SchedulesView
+              schedules={schedules}
+              groups={groups}
+              addSchedule={addSchedule}
+              updateSchedule={updateSchedule}
+              deleteSchedule={deleteSchedule}
+              toggleSchedule={toggleSchedule}
+            />
           )}
         </main>
       </div>
