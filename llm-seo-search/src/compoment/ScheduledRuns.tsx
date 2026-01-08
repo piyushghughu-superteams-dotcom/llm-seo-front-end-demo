@@ -6,7 +6,7 @@ import {
   ToggleRight,
   Trash2
 } from 'lucide-react';
-import type { Schedule, Group, CompetitiveAnalysis } from './types';
+import type { Schedule, Group, CompetitiveAnalysis } from './lmsSeoService';
 
 interface ScheduledRunsProps {
   schedules: Schedule[];

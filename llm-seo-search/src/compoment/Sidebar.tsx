@@ -10,7 +10,7 @@ import {
   Folder,
   MoreHorizontal
 } from 'lucide-react';
-import type { ViewState, Group } from './types';
+import type { ViewState, Group } from './lmsSeoService';
 
 interface SidebarProps {
   currentView: ViewState;

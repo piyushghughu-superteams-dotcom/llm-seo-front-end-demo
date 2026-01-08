@@ -18,7 +18,7 @@ import type {
   CompetitorRunResult,
   Competitor,
   CompetitiveAnalysis
-} from './types';
+} from './lmsSeoService';
 import { ResultModal, CompetitorResultModal } from './ResultModal';
 
 const formatDateKey = (date: Date) => date.toISOString().split('T')[0];

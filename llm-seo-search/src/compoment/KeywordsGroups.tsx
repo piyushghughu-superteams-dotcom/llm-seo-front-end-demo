@@ -4,7 +4,7 @@ import {
   Folder,
   Trash2
 } from 'lucide-react';
-import type { Keyword, Group } from './types';
+import type { Keyword, Group } from './lmsSeoService';
 
 interface KeywordsGroupsProps {
   keywords: Keyword[];

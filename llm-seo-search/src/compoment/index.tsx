@@ -17,7 +17,7 @@ import type {
   Competitor,
   CompetitiveAnalysis as CompetitiveAnalysisType,
   CompetitorRunResult
-} from './types';
+} from './lmsSeoService';
 import Sidebar from './Sidebar';
 import ActiveRuns from './ActiveRuns';
 import KeywordsGroups from './KeywordsGroups';

@@ -8,7 +8,7 @@ import {
   ToggleLeft,
   ToggleRight
 } from 'lucide-react';
-import type { LLMConfig } from './types';
+import type { LLMConfig } from './lmsSeoService';
 
 interface SettingsProps {
   llms: LLMConfig[];

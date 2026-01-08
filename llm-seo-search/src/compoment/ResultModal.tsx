@@ -7,7 +7,7 @@ import {
   AlertCircle,
   FileText
 } from 'lucide-react';
-import type { RunResult, CompetitorRunResult, Competitor, LLMConfig } from './types';
+import type { RunResult, CompetitorRunResult, Competitor, LLMConfig } from './lmsSeoService';
 
 interface ResultModalProps {
   result: RunResult;

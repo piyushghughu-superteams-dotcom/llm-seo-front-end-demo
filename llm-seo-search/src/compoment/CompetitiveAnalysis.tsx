@@ -3,7 +3,7 @@ import {
   Trash2,
   Zap
 } from 'lucide-react';
-import type { Competitor, CompetitiveAnalysis as CompetitiveAnalysisType } from './types';
+import type { Competitor, CompetitiveAnalysis as CompetitiveAnalysisType } from './lmsSeoService';
 
 interface CompetitiveAnalysisProps {
   competitors: Competitor[];
