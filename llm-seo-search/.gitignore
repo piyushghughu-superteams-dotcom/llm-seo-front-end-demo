@@ -1,24 +1,109 @@
+# Dependencies
+node_modules/
+
+# Production builds
+dist/
+build/
+/out/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
 # Logs
-logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# OS generated files
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+
+# TypeScript
+*.tsbuildinfo
+dist/
+.cache/
+
+# Vite
+.vite/
+
+# Lock files
+pnpm-lock.yaml
+yarn.lock
+
+# Next.js
+.next/
+netlify/
+
+# Nuxt.js
+.nuxt/
+output/
+dist/
+
+# Remix
+*.mjs
+.env
+
+# Serverless
+.serverless/
+
+# FuseBox
+.fusebox/
+
+# Parcel
+.cache
+.parcel-cache
+
+# Webpack
+webpack-stats.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Debug
+debug.log
+*.log
+
+# Local development environment
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage/
+.nyc_output/
+junit.xml
+
+# Browser extension
+dev/
+
+# Ejected CRA
+config/
+scripts/
